@@ -115,6 +115,29 @@ install(
     DESTINATION bin
 )
 
+# control center for demo factory
+add_executable(control_center
+    samples/control_center/ControlCenterServer.cpp
+    samples/control_center/ControlCenterHandler.cpp
+)
+target_compile_options(
+    control_center
+    PRIVATE
+        ${_PROXYGEN_COMMON_COMPILE_OPTIONS}
+)
+target_link_libraries(
+    control_center
+    PUBLIC
+        proxygen
+        proxygenhttpserver
+)
+install(
+    TARGETS control_center
+    EXPORT proxygen-exports
+    DESTINATION bin
+)
+
+
 if (BUILD_QUIC)
   add_executable(hq
       samples/hq/main.cpp

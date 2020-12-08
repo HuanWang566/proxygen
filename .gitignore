@@ -24,3 +24,5 @@ _build/
 # common editor artifacts
 *~
 *.vscode*
+
+.history/
