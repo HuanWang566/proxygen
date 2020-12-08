@@ -45,7 +45,7 @@ void ControlCenterHandler::onRequest(
     std::cout << "this is a http get request" << std::endl;
   }
 
-  std::string path = req->getURL();
+  std::string path = req->getPath();
   int defVal = 0;
 
   if (!path.compare(ROBOT_ARM_STATUS_URL_PATH)) {
