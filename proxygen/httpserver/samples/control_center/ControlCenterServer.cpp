@@ -15,6 +15,7 @@
 
 #include "ControlCenterHandler.h"
 #include "ControlCenterStats.h"
+#include "factory_demo/factory.h"
 
 using namespace ControlCenterServer;
 using namespace proxygen;

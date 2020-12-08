@@ -5,13 +5,15 @@
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 #include "ControlCenterHandler.h"
+#include <string>
 
 #include <proxygen/httpserver/RequestHandler.h>
 #include <proxygen/httpserver/ResponseBuilder.h>
 
 #include "ControlCenterStats.h"
+#include "factory_demo/factory.h"
+#include "utils.h"
 
 using namespace proxygen;
 
@@ -21,10 +23,12 @@ DEFINE_bool(request_number,
 
 namespace ControlCenterServer {
 
-ControlCenterHandler::ControlCenterHandler(ControlCenterStats* stats) : stats_(stats) {
+ControlCenterHandler::ControlCenterHandler(ControlCenterStats* stats)
+    : stats_(stats) {
 }
 
-void ControlCenterHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept {
+void ControlCenterHandler::onRequest(
+    std::unique_ptr<HTTPMessage> req) noexcept {
   stats_->recordRequest();
   ResponseBuilder builder(downstream_);
   builder.status(200, "OK");
@@ -35,18 +39,33 @@ void ControlCenterHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept 
   std::cout << "URL, " << req->getURL() << std::endl;
   std::cout << "path, " << req->getPath() << std::endl;
   std::cout << "query, " << req->getQueryString() << std::endl;
-  
+
   builder.body("hello world");
   if (req->getMethod() == HTTPMethod::GET) {
     std::cout << "this is a http get request" << std::endl;
   }
-  if (FLAGS_request_number) {
-    builder.header("Request-Number",
-                   folly::to<std::string>(stats_->getRequestCount()));
+
+  std::string path = req->getURL();
+  int defVal = 0;
+
+  if (!path.compare(ROBOT_ARM_STATUS_URL_PATH)) {
+    int arm_id = req->getIntQueryParam("arm_id", defVal);
+    std::cout << arm_id << std::endl;
+  } else if (!path.compare(AGV_CAR_STATUS_URL_PATH)) {
+    int car_id = req->getIntQueryParam("car_id", defVal);
+    std::cout << car_id << std::endl;
+  } else if (!path.compare(CONVEYOR_STATUS_URL_PATH)) {
+    int conveyor_id = req->getIntQueryParam("conveyor_id", defVal);
+    std::cout << conveyor_id << std::endl;
   }
-  req->getHeaders().forEach([&](std::string& name, std::string& value) {
-    builder.header(folly::to<std::string>("x-ControlCenter-", name), value);
-  });
+  // if (FLAGS_request_number) {
+  //   builder.header("Request-Number",
+  //                  folly::to<std::string>(stats_->getRequestCount()));
+  // }
+  // req->getHeaders().forEach([&](std::string& name, std::string& value) {
+  //   builder.header(folly::to<std::string>("x-ControlCenter-", name),
+  //   value);
+  // });
   builder.send();
 }
 
