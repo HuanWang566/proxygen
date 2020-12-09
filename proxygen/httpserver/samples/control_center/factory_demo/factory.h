@@ -12,7 +12,7 @@ class AGVCar {
   AGVCarStatus status;
 
  public:
-  AGVCar();
+  AGVCar(){}
 
   AGVCar(AGVCarStatus status_) : status(status_) {
   }
@@ -39,7 +39,7 @@ class RobotArm {
   std::atomic_flag lock = ATOMIC_FLAG_INIT;
 
  public:
-  RobotArm();
+  RobotArm(){}
 
   RobotArm(RobotArmStatus status_) : status(status_) {
   }
@@ -114,10 +114,10 @@ class Conveyor {
 
   bool switchConveyor(ConveyorStatus status) {
     if (status == ConveyorStatus::running) {
-      std::cout << "swithc on conveyor" << std::endl;
+      std::cout << "switch on conveyor" << std::endl;
       return true;
     } else if (status == ConveyorStatus::stopping) {
-      std::cout << "swithc off conveyor" << std::endl;
+      std::cout << "switch off conveyor" << std::endl;
       return true;
     }
     return false;
