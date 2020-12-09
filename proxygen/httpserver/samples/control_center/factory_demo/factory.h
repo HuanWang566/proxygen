@@ -12,7 +12,8 @@ class AGVCar {
   AGVCarStatus status;
 
  public:
-  AGVCar(){}
+  AGVCar() {
+  }
 
   AGVCar(AGVCarStatus status_) : status(status_) {
   }
@@ -39,7 +40,8 @@ class RobotArm {
   std::atomic_flag lock = ATOMIC_FLAG_INIT;
 
  public:
-  RobotArm(){}
+  RobotArm() {
+  }
 
   RobotArm(RobotArmStatus status_) : status(status_) {
   }
