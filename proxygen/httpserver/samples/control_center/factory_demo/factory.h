@@ -21,6 +21,8 @@ enum RobotArmStatus { wait, ready, startPick, finish };
 
 enum ConveyorStatus { running, stopping };
 
+enum BlockColor { none, red, green };
+
 class AGVCar {
  private:
   AGVCarStatus status;
@@ -46,11 +48,30 @@ class AGVCar {
   void setStatus(AGVCarStatus status_) {
     this->status = status_;
   }
+
+  string getStatusToString() {
+    switch (this->status) {
+      case AGVCarStatus::arm2:
+        return "arm2";
+        break;
+      case AGVCarStatus::arm3:
+        return "arm3";
+        break;
+      case AGVCarStatus::moving:
+        return "moving";
+        break;
+      default:
+        return "error";
+        break;
+    }
+  }
 };
 
 class RobotArm {
  private:
   RobotArmStatus status;
+  BlockColor blockColor = BlockColor::none;
+
   std::atomic_flag lock = ATOMIC_FLAG_INIT;
 
  public:
@@ -75,6 +96,14 @@ class RobotArm {
     this->status = status_;
   }
 
+  BlockColor getBlockColor() {
+    return this->blockColor;
+  }
+
+  void setBlockColor(BlockColor status_) {
+    this->blockColor = status_;
+  }
+
   bool getSetIsStatus(RobotArmStatus isStatus_, RobotArmStatus status_) {
     bool res = false;
     while (lock.test_and_set())
@@ -97,6 +126,43 @@ class RobotArm {
     }
     lock.clear();
     return res;
+  }
+
+  string getStatusToString() {
+    switch (this->status) {
+      case RobotArmStatus::wait:
+        return "wait";
+        break;
+      case RobotArmStatus::ready:
+        return "ready";
+        break;
+      case RobotArmStatus::startPick:
+        return "startPitypeck";
+        break;
+      case RobotArmStatus::finish:
+        return "finish";
+        break;
+      default:
+        return "error";
+        break;
+    }
+  }
+
+  string getBlockColorToString() {
+    switch (this->blockColor) {
+      case BlockColor::none:
+        return "none";
+        break;
+      case BlockColor::red:
+        return "red";
+        break;
+      case BlockColor::green:
+        return "green";
+        break;
+      default:
+        return "error";
+        break;
+    }
   }
 };
 
@@ -176,6 +242,20 @@ class Conveyor {
 
   void closeSerial() {
     this->m_serialport.close();
+  }
+
+  string getStatusToString() {
+    switch (this->status) {
+      case ConveyorStatus::running:
+        return "running";
+        break;
+      case ConveyorStatus::stopping:
+        return "stopping";
+        break;
+      default:
+        return "error";
+        break;
+    }
   }
 };
 
