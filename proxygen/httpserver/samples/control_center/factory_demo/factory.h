@@ -24,7 +24,7 @@ enum AGVCarStatus { arm2, arm3, moving };
 
 enum RobotArmStatus { wait, ready, startPick, finish };
 
-enum ConveyorStatus { running, stopping };
+enum ConveyorStatus { run, stop };
 
 enum BlockColor { none, red, green };
 
@@ -300,7 +300,7 @@ class Conveyor {
     this->status = status_;
     this->m_serialport.init(this->portName);
     this->m_serialport.open();
-    this->switchConveyor(ConveyorStatus::running);
+    this->switchConveyor(ConveyorStatus::run);
   }
 
   ConveyorStatus getStatus() {
@@ -313,7 +313,7 @@ class Conveyor {
   }
 
   bool switchConveyor(ConveyorStatus status) {
-    if (status == ConveyorStatus::running) {
+    if (status == ConveyorStatus::run) {
       std::cout << "switch on conveyor" << std::endl;
 
       this->serial_sendmsg[0] = 0xFE;
@@ -328,7 +328,7 @@ class Conveyor {
       this->m_serialport.writeData(serial_sendmsg, sizeof(serial_sendmsg));
 
       return true;
-    } else if (status == ConveyorStatus::stopping) {
+    } else if (status == ConveyorStatus::stop) {
       std::cout << "switch off conveyor" << std::endl;
 
       this->serial_sendmsg[0] = 0xFE;
@@ -357,11 +357,11 @@ class Conveyor {
 
   string getStatusToString() {
     switch (this->status) {
-      case ConveyorStatus::running:
-        return "running";
+      case ConveyorStatus::run:
+        return "run";
         break;
-      case ConveyorStatus::stopping:
-        return "stopping";
+      case ConveyorStatus::stop:
+        return "stop";
         break;
       default:
         return "error";
@@ -381,11 +381,11 @@ class Conveyor {
   bool transferStringStatus(std::string statusString_,
                             ConveyorStatus& status_) {
     if (!statusString_.compare("run")) {
-      status_ = ConveyorStatus::running;
+      status_ = ConveyorStatus::run;
       return true;
     }
     if (!statusString_.compare("stop")) {
-      status_ = ConveyorStatus::stopping;
+      status_ = ConveyorStatus::stop;
       return true;
     }
 
@@ -420,13 +420,13 @@ class Factory {
       robotArm[i].init(RobotArmStatus::wait);
     }
     for (int i = 0; i < conveyorNumber_; i++) {
-      conveyor[i].init(ConveyorStatus::running);
+      conveyor[i].init(ConveyorStatus::run);
     }
   }
 
   ~Factory() {
     for (int i = 0; i < this->conveyorNumber; i++) {
-      this->conveyor[i].switchConveyor(ConveyorStatus::stopping);
+      this->conveyor[i].switchConveyor(ConveyorStatus::stop);
       if (this->conveyor[i].serialIsOpened()) {
         this->conveyor[i].closeSerial();
       }
