@@ -71,13 +71,16 @@ class AGVCar {
     }
   }
 
-  void setStatus(string status_) {
+  bool setStatus(string status_) {
     AGVCarStatus status_temp;
-    if (transferStringStatus(status_, status_temp))
+    if (transferStringStatus(status_, status_temp)){
       setStatus(status_temp);
+      return true;
+    }
+    return false;
   }
 
-  bool transferStringStatus(std::string statusString_, AGVCarStatus &status_) {
+  bool transferStringStatus(std::string statusString_, AGVCarStatus& status_) {
     if (!statusString_.compare("arm2")) {
       status_ = AGVCarStatus::arm2;
       return true;
@@ -124,13 +127,17 @@ class RobotArm {
     this->status = status_;
   }
 
-  void setStatus(string status_) {
+  bool setStatus(string status_) {
     RobotArmStatus status_temp;
-    if (transferStringStatus(status_, status_temp))
+    if (transferStringStatus(status_, status_temp)){
       setStatus(status_temp);
+      return true;
+    }
+    return false;
   }
 
-  bool transferStringStatus(std::string statusString_, RobotArmStatus &status_) {
+  bool transferStringStatus(std::string statusString_,
+                            RobotArmStatus& status_) {
     if (!statusString_.compare("wait")) {
       status_ = RobotArmStatus::wait;
       return true;
@@ -151,13 +158,16 @@ class RobotArm {
     return false;
   }
 
-  void setBlockColor(string color_) {
+  bool setBlockColor(string color_) {
     BlockColor color_temp;
-    if (transferStringBlockColor(color_, color_temp))
+    if (transferStringBlockColor(color_, color_temp)){
       setBlockColor(color_temp);
+      return true;
+    }
+    return false;
   }
 
-  bool transferStringBlockColor(std::string colorString_, BlockColor &color_) {
+  bool transferStringBlockColor(std::string colorString_, BlockColor& color_) {
     if (!colorString_.compare("none")) {
       color_ = BlockColor::none;
       return true;
@@ -193,6 +203,18 @@ class RobotArm {
     return res;
   }
 
+  bool getSetIsStatus(string isStatus_, string status_) {
+    RobotArmStatus is_status_temp;
+    RobotArmStatus status_temp;
+    if (transferStringStatus(status_, status_temp) &&
+        transferStringStatus(isStatus_, is_status_temp)) {
+      if (getSetIsStatus(is_status_temp, status_temp)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   bool getSetNotStatus(RobotArmStatus notStatus_, RobotArmStatus status_) {
     bool res = false;
     while (lock.test_and_set())
@@ -203,6 +225,18 @@ class RobotArm {
     }
     lock.clear();
     return res;
+  }
+
+  bool getSetNotStatus(string notStatus_, string status_) {
+    RobotArmStatus not_status_temp;
+    RobotArmStatus status_temp;
+    if (transferStringStatus(status_, status_temp) &&
+        transferStringStatus(notStatus_, not_status_temp)) {
+      if (getSetNotStatus(not_status_temp, status_temp)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   string getStatusToString() {
@@ -335,13 +369,17 @@ class Conveyor {
     }
   }
 
-  void setStatus(string status_) {
+  bool setStatus(string status_) {
     ConveyorStatus status_temp;
-    if (transferStringStatus(status_, status_temp))
+    if (transferStringStatus(status_, status_temp)){
       setStatus(status_temp);
+      return true;
+    }
+    return false;
   }
 
-  bool transferStringStatus(std::string statusString_, ConveyorStatus &status_) {
+  bool transferStringStatus(std::string statusString_,
+                            ConveyorStatus& status_) {
     if (!statusString_.compare("running")) {
       status_ = ConveyorStatus::running;
       return true;

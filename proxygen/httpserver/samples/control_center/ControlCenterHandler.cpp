@@ -51,6 +51,8 @@ void ControlCenterHandler::onRequest(
   std::string path = req->getPath();
   int defVal = 0;
 
+  // TODO: when set a value, use httpPut instead of  httpGet
+
   if (!path.compare(GET_ROBOT_ARM_STATUS_URL_PATH)) {
     int arm_id = req->getIntQueryParam("arm_id", defVal);
     // my_factory.findRobotArmByID(arm_id)->getStatusToString();
@@ -67,20 +69,55 @@ void ControlCenterHandler::onRequest(
   } else if (!path.compare(SET_ROBOT_ARM_STATUS_URL_PATH)) {
     int arm_id = req->getIntQueryParam("arm_id", defVal);
     string status = req->getQueryParam("status");
-    my_factory.findRobotArmByID(arm_id)->setStatus(status);
-    builder.body("OK");
+    if (my_factory.findRobotArmByID(arm_id)->setStatus(status)) {
+      builder.body("SUCCESS");
+    } else {
+      builder.body("FAIL");
+    }
   } else if (!path.compare(SET_AGV_CAR_STATUS_URL_PATH)) {
     int car_id = req->getIntQueryParam("car_id");
     string status = req->getQueryParam("status");
-    builder.body("OK");
+    if (my_factory.findAGVCarByID(car_id)->setStatus(status)) {
+      builder.body("SUCCESS");
+    } else {
+      builder.body("FAIL");
+    }
   } else if (!path.compare(SET_CONVEYOR_STATUS_URL_PATH)) {
     int conveyor_id = req->getIntQueryParam("conveyor_id");
     string status = req->getQueryParam("status");
-    builder.body("OK");
+    if (my_factory.findConveyorByID(conveyor_id)->setStatus(status)) {
+      builder.body("SUCCESS");
+    } else {
+      builder.body("FAIL");
+    }
   } else if (!path.compare(SET_BLOCK_COLOR_URL_PATH)) {
     int arm_id = req->getIntQueryParam("arm_id");
-    string status = req->getQueryParam("blockColor");
-    builder.body("OK");
+    string color = req->getQueryParam("blockColor");
+    if (my_factory.findRobotArmByID(arm_id)->setBlockColor(color)) {
+      builder.body("SUCCESS");
+    } else {
+      builder.body("FAIL");
+    }
+  } else if (!path.compare(GET_SET_ROBOT_ARM_NOT_STATUS_URL_PATH)) {
+    int arm_id = req->getIntQueryParam("arm_id", defVal);
+    string not_status = req->getQueryParam("not_status");
+    string status = req->getQueryParam("status");
+    if (my_factory.findRobotArmByID(arm_id)->getSetNotStatus(not_status,
+                                                             status)) {
+      builder.body("SUCCESS");
+    } else {
+      builder.body("FAIL");
+    }
+  } else if (!path.compare(GET_ROBOT_ARM_IS_STATUS_URL_PATH)) {
+    int arm_id = req->getIntQueryParam("arm_id", defVal);
+    string is_status = req->getQueryParam("is_status");
+    string status = req->getQueryParam("status");
+    if (my_factory.findRobotArmByID(arm_id)->getSetIsStatus(is_status,
+                                                            status)) {
+      builder.body("SUCCESS");
+    } else {
+      builder.body("FAIL");
+    }
   }
 
   if (req->hasQueryParam("account")) {
