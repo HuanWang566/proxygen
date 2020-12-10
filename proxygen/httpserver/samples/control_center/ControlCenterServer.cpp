@@ -83,6 +83,12 @@ int main(int argc, char* argv[]) {
   HTTPServer server(std::move(options));
   server.bind(IPs);
 
+  int car_number = 2;
+  int arm_number = 3;
+  int conveyor_number = 1;
+
+  Factory factory(car_number, arm_number, conveyor_number);
+
   // Start HTTPServer mainloop in a separate thread
   std::thread t([&]() { server.start(); });
 

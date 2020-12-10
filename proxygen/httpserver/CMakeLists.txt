@@ -115,11 +115,25 @@ install(
     DESTINATION bin
 )
 
-# control center for demo factory
+# begin of control center for demo factory
+include_directories(../../../CSerialPort/include)
+
+file(GLOB_RECURSE COMMON_SOURCES ../../../CSerialPort/src/SerialPort.cpp ../../../CSerialPort/src/SerialPortBase.cpp ../../../CSerialPort/src/SerialPortInfo.cpp ../../../CSerialPort/src/SerialPortInfoBase.cpp)
+
+IF (CMAKE_HOST_WIN32)
+	file(GLOB_RECURSE OS_ABOUT_SOURCES ../../../CSerialPort/src/SerialPortInfoWinBase.cpp ../../../CSerialPort/src/SerialPortWinBase.cpp)
+ELSEIF (CMAKE_HOST_UNIX)
+	file(GLOB_RECURSE OS_ABOUT_SOURCES ../../../CSerialPort/src/SerialPortInfoUnixBase.cpp ../../../CSerialPort/src/SerialPortUnixBase.cpp)
+ENDIF ()
+
 add_executable(control_center
     samples/control_center/ControlCenterServer.cpp
     samples/control_center/ControlCenterHandler.cpp
+    ${COMMON_SOURCES} 
+    ${OS_ABOUT_SOURCES}
 )
+
+
 target_compile_options(
     control_center
     PRIVATE
@@ -130,13 +144,16 @@ target_link_libraries(
     PUBLIC
         proxygen
         proxygenhttpserver
+        pthread
 )
+
 install(
     TARGETS control_center
     EXPORT proxygen-exports
     DESTINATION bin
 )
 
+# end of control center for demo factory
 
 if (BUILD_QUIC)
   add_executable(hq

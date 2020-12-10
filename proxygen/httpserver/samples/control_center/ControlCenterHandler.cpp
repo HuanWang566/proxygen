@@ -13,7 +13,7 @@
 
 #include "ControlCenterStats.h"
 #include "factory_demo/factory.h"
-#include "utils.h"
+#include "factory_demo/utils.h"
 
 using namespace proxygen;
 

@@ -1,5 +1,19 @@
+#include "../../../../../CSerialPort/include/CSerialPort/SerialPort.h"
+#include "../../../../../CSerialPort/include/CSerialPort/SerialPortInfo.h"
 #include <atomic>
 #include <iostream>
+using namespace itas109;
+
+#include <vector>
+using namespace std;
+
+#ifdef I_OS_WIN
+#define imsleep(x) Sleep(x)
+#elif defined I_OS_UNIX // unix
+#define imsleep(x) usleep(1000 * x)
+#else
+#define imsleep(x)
+#endif
 
 enum AGVCarStatus { arm2, arm3, moving };
 
@@ -89,6 +103,10 @@ class RobotArm {
 class Conveyor {
  private:
   ConveyorStatus status;
+  CSerialPort m_serialport;
+  //   std::string portName = "/dev/ttyS5";
+  std::string portName = "/dev/pts/0";
+  char serial_sendmsg[8] = {0};
 
  public:
   Conveyor() {
@@ -103,6 +121,9 @@ class Conveyor {
 
   void init(ConveyorStatus status_) {
     this->status = status_;
+    this->m_serialport.init(this->portName);
+    this->m_serialport.open();
+    this->switchConveyor(ConveyorStatus::running);
   }
 
   ConveyorStatus getStatus() {
@@ -117,12 +138,44 @@ class Conveyor {
   bool switchConveyor(ConveyorStatus status) {
     if (status == ConveyorStatus::running) {
       std::cout << "switch on conveyor" << std::endl;
+
+      this->serial_sendmsg[0] = 0xFE;
+      this->serial_sendmsg[1] = 0x05;
+      this->serial_sendmsg[2] = 0x00;
+      this->serial_sendmsg[3] = 0x01;
+      this->serial_sendmsg[4] = 0xFF;
+      this->serial_sendmsg[5] = 0x00;
+      this->serial_sendmsg[6] = 0xC9;
+      this->serial_sendmsg[7] = 0xF5;
+
+      this->m_serialport.writeData(serial_sendmsg, sizeof(serial_sendmsg));
+
       return true;
     } else if (status == ConveyorStatus::stopping) {
       std::cout << "switch off conveyor" << std::endl;
+
+      this->serial_sendmsg[0] = 0xFE;
+      this->serial_sendmsg[1] = 0x05;
+      this->serial_sendmsg[2] = 0x00;
+      this->serial_sendmsg[3] = 0x01;
+      this->serial_sendmsg[4] = 0x00;
+      this->serial_sendmsg[5] = 0x00;
+      this->serial_sendmsg[6] = 0x88;
+      this->serial_sendmsg[7] = 0x05;
+
+      this->m_serialport.writeData(serial_sendmsg, sizeof(serial_sendmsg));
+
       return true;
     }
     return false;
+  }
+
+  bool serialIsOpened() {
+    return this->m_serialport.isOpened();
+  }
+
+  void closeSerial() {
+    this->m_serialport.close();
   }
 };
 
@@ -158,5 +211,11 @@ class Factory {
   }
 
   ~Factory() {
+    for (int i = 0; i < this->conveyorNumber; i++) {
+      this->conveyor[i].switchConveyor(ConveyorStatus::stopping);
+      if (this->conveyor[i].serialIsOpened()) {
+        this->conveyor[i].closeSerial();
+      }
+    }
   }
 };
