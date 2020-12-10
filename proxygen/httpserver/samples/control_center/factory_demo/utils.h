@@ -1,3 +1,5 @@
+#pragma once
+
 #define GET_ROBOT_ARM_STATUS_URL_PATH "/get_arm_status"
 #define GET_AGV_CAR_STATUS_URL_PATH   "/get_car_status"
 #define GET_CONVEYOR_STATUS_URL_PATH  "/get_conveyor_status"

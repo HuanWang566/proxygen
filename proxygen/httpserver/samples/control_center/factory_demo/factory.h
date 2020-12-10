@@ -1,7 +1,12 @@
+#pragma once
+#ifndef __FACTRORY_H__
+#define __FACTRORY_H__
+
 #include "../../../../../CSerialPort/include/CSerialPort/SerialPort.h"
 #include "../../../../../CSerialPort/include/CSerialPort/SerialPortInfo.h"
 #include <atomic>
 #include <iostream>
+
 using namespace itas109;
 
 #include <vector>
@@ -65,6 +70,29 @@ class AGVCar {
         break;
     }
   }
+
+  void setStatus(string status_) {
+    AGVCarStatus status_temp;
+    if (transferStringStatus(status_, status_temp))
+      setStatus(status_temp);
+  }
+
+  bool transferStringStatus(std::string statusString_, AGVCarStatus &status_) {
+    if (!statusString_.compare("arm2")) {
+      status_ = AGVCarStatus::arm2;
+      return true;
+    }
+    if (!statusString_.compare("arm3")) {
+      status_ = AGVCarStatus::arm3;
+      return true;
+    }
+    if (!statusString_.compare("moving")) {
+      status_ = AGVCarStatus::moving;
+      return true;
+    }
+
+    return false;
+  }
 };
 
 class RobotArm {
@@ -96,12 +124,61 @@ class RobotArm {
     this->status = status_;
   }
 
+  void setStatus(string status_) {
+    RobotArmStatus status_temp;
+    if (transferStringStatus(status_, status_temp))
+      setStatus(status_temp);
+  }
+
+  bool transferStringStatus(std::string statusString_, RobotArmStatus &status_) {
+    if (!statusString_.compare("wait")) {
+      status_ = RobotArmStatus::wait;
+      return true;
+    }
+    if (!statusString_.compare("ready")) {
+      status_ = RobotArmStatus::ready;
+      return true;
+    }
+    if (!statusString_.compare("startPick")) {
+      status_ = RobotArmStatus::startPick;
+      return true;
+    }
+    if (!statusString_.compare("finish")) {
+      status_ = RobotArmStatus::finish;
+      return true;
+    }
+
+    return false;
+  }
+
+  void setBlockColor(string color_) {
+    BlockColor color_temp;
+    if (transferStringBlockColor(color_, color_temp))
+      setBlockColor(color_temp);
+  }
+
+  bool transferStringBlockColor(std::string colorString_, BlockColor &color_) {
+    if (!colorString_.compare("none")) {
+      color_ = BlockColor::none;
+      return true;
+    }
+    if (!colorString_.compare("red")) {
+      color_ = BlockColor::red;
+      return true;
+    }
+    if (!colorString_.compare("green")) {
+      color_ = BlockColor::green;
+      return true;
+    }
+    return false;
+  }
+
   BlockColor getBlockColor() {
     return this->blockColor;
   }
 
-  void setBlockColor(BlockColor status_) {
-    this->blockColor = status_;
+  void setBlockColor(BlockColor color_) {
+    this->blockColor = color_;
   }
 
   bool getSetIsStatus(RobotArmStatus isStatus_, RobotArmStatus status_) {
@@ -137,7 +214,7 @@ class RobotArm {
         return "ready";
         break;
       case RobotArmStatus::startPick:
-        return "startPitypeck";
+        return "startPick";
         break;
       case RobotArmStatus::finish:
         return "finish";
@@ -257,6 +334,25 @@ class Conveyor {
         break;
     }
   }
+
+  void setStatus(string status_) {
+    ConveyorStatus status_temp;
+    if (transferStringStatus(status_, status_temp))
+      setStatus(status_temp);
+  }
+
+  bool transferStringStatus(std::string statusString_, ConveyorStatus &status_) {
+    if (!statusString_.compare("running")) {
+      status_ = ConveyorStatus::running;
+      return true;
+    }
+    if (!statusString_.compare("stopping")) {
+      status_ = ConveyorStatus::stopping;
+      return true;
+    }
+
+    return false;
+  }
 };
 
 class Factory {
@@ -264,9 +360,9 @@ class Factory {
   int AGVCarNumber;
   int robotArmNumber;
   int conveyorNumber;
-  RobotArm *robotArm;
-  AGVCar *agvCar;
-  Conveyor *conveyor;
+  RobotArm* robotArm;
+  AGVCar* agvCar;
+  Conveyor* conveyor;
 
  public:
   Factory(int AGVCarNumber_ = 2,
@@ -298,4 +394,21 @@ class Factory {
       }
     }
   }
+
+  RobotArm* findRobotArmByID(int id) {
+    assert(id >= 0 && id < this->robotArmNumber);
+    return &robotArm[id - 1];
+  }
+
+  AGVCar* findAGVCarByID(int id) {
+    assert(id >= 0 && id < this->AGVCarNumber);
+    return &agvCar[id - 1];
+  }
+
+  Conveyor* findConveyorByID(int id) {
+    assert(id >= 0 && id < this->conveyorNumber);
+    return &conveyor[id - 1];
+  }
 };
+
+#endif

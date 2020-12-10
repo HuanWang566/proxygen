@@ -1,3 +1,5 @@
+#pragma once
+
 // the command of the switch of the conveyor
 // switch on
 // FE 05 00 00 FF 00 98 35
