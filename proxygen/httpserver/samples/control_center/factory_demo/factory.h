@@ -281,8 +281,8 @@ class Conveyor {
  private:
   ConveyorStatus status;
   CSerialPort m_serialport;
-  //   std::string portName = "/dev/ttyS5";
-  std::string portName = "/dev/pts/0";
+  std::string portName = "/dev/ttyS5";
+  // std::string portName = "/dev/pts/0";
   char serial_sendmsg[8] = {0};
 
  public:
@@ -380,11 +380,11 @@ class Conveyor {
 
   bool transferStringStatus(std::string statusString_,
                             ConveyorStatus& status_) {
-    if (!statusString_.compare("running")) {
+    if (!statusString_.compare("run")) {
       status_ = ConveyorStatus::running;
       return true;
     }
-    if (!statusString_.compare("stopping")) {
+    if (!statusString_.compare("stop")) {
       status_ = ConveyorStatus::stopping;
       return true;
     }

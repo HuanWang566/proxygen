@@ -36,12 +36,13 @@ void ControlCenterHandler::onRequest(
   ResponseBuilder builder(downstream_);
   builder.status(200, "OK");
 
-  std::cout << "req cnt, " << stats_->getRequestCount() << std::endl;
-  std::cout << "method , " << req->getMethodString() << std::endl;
-  std::cout << "DST IP, " << req->getDstIP() << std::endl;
+  // std::cout << "req cnt, " << stats_->getRequestCount() << std::endl;
+  // std::cout << "method , " << req->getMethodString() << std::endl;
+  // std::cout << "DST IP, " << req->getDstIP() << std::endl;
   std::cout << "URL, " << req->getURL() << std::endl;
   std::cout << "path, " << req->getPath() << std::endl;
   std::cout << "query, " << req->getQueryString() << std::endl;
+  std::cout << "--------------------------------------" << std::endl;
 
   // builder.body("hello world");
   // if (req->getMethod() == HTTPMethod::GET) {
@@ -92,7 +93,7 @@ void ControlCenterHandler::onRequest(
     }
   } else if (!path.compare(SET_BLOCK_COLOR_URL_PATH)) {
     int arm_id = req->getIntQueryParam("arm_id");
-    string color = req->getQueryParam("blockColor");
+    string color = req->getQueryParam("color");
     if (my_factory.findRobotArmByID(arm_id)->setBlockColor(color)) {
       builder.body("SUCCESS");
     } else {
