@@ -4,12 +4,14 @@
 
 #include "../../../../../CSerialPort/include/CSerialPort/SerialPort.h"
 #include "../../../../../CSerialPort/include/CSerialPort/SerialPortInfo.h"
+#include "utils.h"
+#include <assert.h>
 #include <atomic>
 #include <iostream>
+#include <vector>
 
 using namespace itas109;
 
-#include <vector>
 using namespace std;
 
 #ifdef I_OS_WIN
@@ -73,7 +75,7 @@ class AGVCar {
 
   bool setStatus(string status_) {
     AGVCarStatus status_temp;
-    if (transferStringStatus(status_, status_temp)){
+    if (transferStringStatus(status_, status_temp)) {
       setStatus(status_temp);
       return true;
     }
@@ -129,7 +131,7 @@ class RobotArm {
 
   bool setStatus(string status_) {
     RobotArmStatus status_temp;
-    if (transferStringStatus(status_, status_temp)){
+    if (transferStringStatus(status_, status_temp)) {
       setStatus(status_temp);
       return true;
     }
@@ -160,7 +162,7 @@ class RobotArm {
 
   bool setBlockColor(string color_) {
     BlockColor color_temp;
-    if (transferStringBlockColor(color_, color_temp)){
+    if (transferStringBlockColor(color_, color_temp)) {
       setBlockColor(color_temp);
       return true;
     }
@@ -281,8 +283,7 @@ class Conveyor {
  private:
   ConveyorStatus status;
   CSerialPort m_serialport;
-  std::string portName = "/dev/ttyS5";
-  // std::string portName = "/dev/pts/0";
+  std::string portName;
   char serial_sendmsg[8] = {0};
 
  public:
@@ -296,7 +297,8 @@ class Conveyor {
   ~Conveyor() {
   }
 
-  void init(ConveyorStatus status_) {
+  void init(ConveyorStatus status_, std::string portName_) {
+    this->portName = portName_;
     this->status = status_;
     this->m_serialport.init(this->portName);
     this->m_serialport.open();
@@ -371,7 +373,7 @@ class Conveyor {
 
   bool setStatus(string status_) {
     ConveyorStatus status_temp;
-    if (transferStringStatus(status_, status_temp)){
+    if (transferStringStatus(status_, status_temp)) {
       setStatus(status_temp);
       return true;
     }
@@ -420,10 +422,10 @@ class Factory {
       robotArm[i].init(RobotArmStatus::wait);
     }
     for (int i = 0; i < conveyorNumber_; i++) {
-      conveyor[i].init(ConveyorStatus::run);
+      conveyor[i].init(ConveyorStatus::run, SERIAL_PORT_NAME);
     }
   }
-
+ 
   ~Factory() {
     for (int i = 0; i < this->conveyorNumber; i++) {
       this->conveyor[i].switchConveyor(ConveyorStatus::stop);
@@ -434,17 +436,17 @@ class Factory {
   }
 
   RobotArm* findRobotArmByID(int id) {
-    assert(id >= 0 && id < this->robotArmNumber);
+    assert(id > 0 && id <= this->robotArmNumber);
     return &robotArm[id - 1];
   }
 
   AGVCar* findAGVCarByID(int id) {
-    assert(id >= 0 && id < this->AGVCarNumber);
+    assert(id > 0 && id <= this->AGVCarNumber);
     return &agvCar[id - 1];
   }
 
   Conveyor* findConveyorByID(int id) {
-    assert(id >= 0 && id < this->conveyorNumber);
+    assert(id > 0 && id <= this->conveyorNumber);
     return &conveyor[id - 1];
   }
 };

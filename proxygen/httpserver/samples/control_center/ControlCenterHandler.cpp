@@ -24,7 +24,7 @@ DEFINE_bool(request_number,
 namespace ControlCenterServer {
 
 // TODO:check why must define this varible in this file
-Factory my_factory(2, 3, 1);
+Factory my_factory(AGV_CAR_NUMBER, ROBOT_ARM_NUMBER, CONVEYOR_NUMBER);
 
 ControlCenterHandler::ControlCenterHandler(ControlCenterStats* stats)
     : stats_(stats) {
@@ -39,6 +39,7 @@ void ControlCenterHandler::onRequest(
   // std::cout << "req cnt, " << stats_->getRequestCount() << std::endl;
   // std::cout << "method , " << req->getMethodString() << std::endl;
   // std::cout << "DST IP, " << req->getDstIP() << std::endl;
+  std::cout << "local IP, " << req->getLocalIp() << std::endl;
   std::cout << "URL, " << req->getURL() << std::endl;
   std::cout << "path, " << req->getPath() << std::endl;
   std::cout << "query, " << req->getQueryString() << std::endl;
